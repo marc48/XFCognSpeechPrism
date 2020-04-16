@@ -9,3 +9,7 @@
  * Important! You must get an Azure suscription key for using the service (free for private users).
  * Language tested: de-DE
  * 
+ 
+ ## TODO
+ * Select language
+ * 
