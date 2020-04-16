@@ -4,14 +4,12 @@ using Prism.Navigation;
 using Prism.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using System.Diagnostics;
 using XFCognSpeechPrism.Helpers;
-using XFCognSpeechPrism.Models;
 using Microsoft.CognitiveServices.Speech;
 using XFCognSpeechPrism.Services;
 
@@ -23,33 +21,8 @@ namespace XFCognSpeechPrism.ViewModels
         private SpeechRecognizer recognizer = null;
         IMicrophoneService micService;
         private bool isTranscribing = false;
-
-        //AudioRecorderService recorder;
-        //SpeechApiClient speechClient;
-
-        //public Array SpeechRegions => Enum.GetValues(typeof(SpeechRegion));
-        //public SpeechRegion SpeechRegion { get; set; } = SpeechRegion.WestEurope;
-        //public Array AuthenticationModes => Enum.GetValues(typeof(AuthenticationMode));
-        //public AuthenticationMode AuthenticationMode { get; set; } = AuthenticationMode.SubscriptionKey;
-        //public Array RecognitionModes => Enum.GetValues(typeof(RecognitionMode));
-        //public RecognitionMode RecognitionMode { get; set; } = RecognitionMode.Interactive;
-        //public Array ProfanityModes => Enum.GetValues(typeof(ProfanityMode));
-        //public ProfanityMode ProfanityMode { get; set; } = ProfanityMode.Masked;
-        //public Array OutputModes => Enum.GetValues(typeof(OutputMode));
-        //public OutputMode OutputMode { get; set; } = OutputMode.Simple;
-
-        private ObservableCollection<Sentence> _sents;
-        public ObservableCollection<Sentence> Sents
-        {
-            get { return _sents; }
-            set { SetProperty(ref _sents, value); }
-        }
-        private Sentence _sentence;
-        public Sentence Sentence
-        {
-            get { return _sentence; }
-            set { SetProperty(ref _sentence, value); }
-        }
+        private bool firsttime;
+        private string language;
 
         private bool _streamSwitch;
         public bool StreamSwitch
@@ -112,14 +85,13 @@ namespace XFCognSpeechPrism.ViewModels
             : base(navigationService)
         {
             _dialogService = dialogService;
-            //micService = 
             SettingsPageCommand = new DelegateCommand(NavToSettings);
             RecordCommand = new DelegateCommand(TranscribeSent);
             Title = "Record Page";
 
-            _recBtnText = "Record Sent";
+            _recBtnText = "Transcribe";
             _buttonEnabled = true;
-            _sents = new ObservableCollection<Sentence>();
+            _btnColor = Color.FromHex("#43a047");
 
             //recorder = new AudioRecorderService
             //{
@@ -135,11 +107,9 @@ namespace XFCognSpeechPrism.ViewModels
 
             //speechClient = new SpeechApiClient(Keys.Speech.SubscriptionKey, SpeechRegion);
 
-            // Liste belegen
-            _sents.Add(new Sentence() { Text = "Der erste Satz." });
-
             micService = Xamarin.Forms.DependencyService.Resolve<IMicrophoneService>();
-            
+            firsttime = true;
+            language = "de-DE";
         }
 
         private async void TranscribeSent()
@@ -160,7 +130,7 @@ namespace XFCognSpeechPrism.ViewModels
             if (recognizer == null)
             {
                 var config = SpeechConfig.FromSubscription(Constants.CognitiveServicesApiKey, Constants.CognitiveServicesRegion);
-                recognizer = new SpeechRecognizer(config, "de-DE");  // 8 overloads!
+                recognizer = new SpeechRecognizer(config, language);  // 8 overloads!
 
                 recognizer.Recognized += (obj, args) =>
                 {
@@ -187,7 +157,11 @@ namespace XFCognSpeechPrism.ViewModels
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    InsertDateTimeRecord();
+                    if (firsttime == true)
+                    {
+                        InsertDateTimeRecord();
+                        firsttime = false;
+                    }
                 });
                 try
                 {
@@ -201,7 +175,6 @@ namespace XFCognSpeechPrism.ViewModels
             }
             
             UpdateDisplayState();
-            //UpdateTranscription("Bis hierher und nicht weiter...");
         }
 
         void UpdateTranscription(string newText)
@@ -210,8 +183,7 @@ namespace XFCognSpeechPrism.ViewModels
             {
                 if (!string.IsNullOrWhiteSpace(newText))
                 {
-                    //ResultsText += $"{newText}\n";
-                    _sents.Add(new Sentence() { Text = newText });
+                    ResultsText += $"{newText}\n";
                 }
             });
         }
@@ -229,13 +201,13 @@ namespace XFCognSpeechPrism.ViewModels
                 if (isTranscribing)
                 {
                     RecBtnText = "Stop";
-                    BtnColor = Color.Red;
+                    BtnColor = Color.FromHex("#e53935");
                     SpinnerEnabled = true;
                 }
                 else
                 {
                     RecBtnText = "Transcribe";
-                    BtnColor = Color.Green;
+                    BtnColor = Color.FromHex("#43a047");
                     SpinnerEnabled = false;
                 }
             });

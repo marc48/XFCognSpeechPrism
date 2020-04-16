@@ -10,7 +10,7 @@ namespace XFCognSpeechPrism.ViewModels
     {
         public SettingsPageViewModel()
         {
-
+            
         }
     }
 }
