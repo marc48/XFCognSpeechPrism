@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.DryIoc;assembly=Prism.DryIoc.Forms"
+             x:Class="XFCognSpeechPrism.App">
+	<Application.Resources>
+
+    <ResourceDictionary>
+      <!-- Styles -->
+      <Style TargetType="NavigationPage">
+        <Setter Property="BarBackgroundColor" Value="#0277bd"/>
+        <Setter Property="BarTextColor" Value="White"/>
+      </Style>
+      <!-- Styles -->
+    </ResourceDictionary>
+
+  </Application.Resources>
+</prism:PrismApplication>
