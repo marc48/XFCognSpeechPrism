@@ -22,7 +22,6 @@ namespace XFCognSpeechPrism.ViewModels
         IMicrophoneService micService;
         private bool isTranscribing = false;
         private bool firsttime;
-        private string language;
 
         private bool _streamSwitch;
         public bool StreamSwitch
@@ -77,6 +76,13 @@ namespace XFCognSpeechPrism.ViewModels
             set { SetProperty(ref _resultsText, value); }
         }
 
+        private string _language;
+        public string Language
+        {
+            get { return _language; }
+            set { SetProperty(ref _language, value); }
+        }
+
         public DelegateCommand SettingsPageCommand { get; set; }
         public DelegateCommand RecordCommand { get; set; }
 
@@ -109,7 +115,7 @@ namespace XFCognSpeechPrism.ViewModels
 
             micService = Xamarin.Forms.DependencyService.Resolve<IMicrophoneService>();
             firsttime = true;
-            language = "de-DE";
+            _language = "de-DE";
         }
 
         private async void TranscribeSent()
@@ -130,7 +136,7 @@ namespace XFCognSpeechPrism.ViewModels
             if (recognizer == null)
             {
                 var config = SpeechConfig.FromSubscription(Constants.CognitiveServicesApiKey, Constants.CognitiveServicesRegion);
-                recognizer = new SpeechRecognizer(config, language);  // 8 overloads!
+                recognizer = new SpeechRecognizer(config, Language);  // 8 overloads!
 
                 recognizer.Recognized += (obj, args) =>
                 {
@@ -157,11 +163,11 @@ namespace XFCognSpeechPrism.ViewModels
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    if (firsttime == true)
-                    {
+                    //if (firsttime == true)
+                    //{
                         InsertDateTimeRecord();
-                        firsttime = false;
-                    }
+                    //    firsttime = false;
+                    //}
                 });
                 try
                 {

@@ -23,7 +23,7 @@
         <Button Text="{Binding RecBtnText}" FontSize="24" HorizontalOptions="FillAndExpand"
                 Command="{Binding RecordCommand}" IsEnabled="{Binding ButtonEnabled}" 
                 BackgroundColor="{Binding BtnColor}"/>
-        <Label Text="(15 sec max currently)" FontSize="14" HorizontalOptions="Center" />
+        <Label Text="{Binding Language}" FontSize="14" HorizontalOptions="Center" />
         <Label Text="Output:" />
         <Label Text="{Binding ResultsText}" HorizontalOptions="CenterAndExpand" LineBreakMode="WordWrap" 
                MinimumHeightRequest="300" MinimumWidthRequest="500" BackgroundColor="LightGray"
@@ -31,7 +31,7 @@
       </StackLayout>
       <ContentView IsVisible="{Binding SpinnerEnabled}" HorizontalOptions="Fill" VerticalOptions="Fill" 
                    BackgroundColor="#A6FFFFFF">
-        <ActivityIndicator x:Name="spinner" WidthRequest="100" HeightRequest="100" 
+        <ActivityIndicator IsRunning="{Binding SpinnerEnabled}" WidthRequest="100" HeightRequest="100" 
                            HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" />
       </ContentView>
     </StackLayout>
