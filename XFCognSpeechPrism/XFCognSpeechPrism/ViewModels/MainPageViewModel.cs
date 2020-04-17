@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using System.Diagnostics;
 using XFCognSpeechPrism.Helpers;
 using Microsoft.CognitiveServices.Speech;
 using XFCognSpeechPrism.Services;
@@ -18,28 +17,11 @@ namespace XFCognSpeechPrism.ViewModels
     public class MainPageViewModel : ViewModelBase
     {
         private IPageDialogService _dialogService;
+        private INavigationService _navigationService;
         private SpeechRecognizer recognizer = null;
         IMicrophoneService micService;
         private bool isTranscribing = false;
         private bool firsttime;
-
-        private bool _streamSwitch;
-        public bool StreamSwitch
-        {
-            get { return _streamSwitch; }
-            set
-            {
-                SetProperty(ref _streamSwitch, value);
-                SwitchStreamToggle();
-            }
-        }
-        private void SwitchStreamToggle()
-        {
-            if (_streamSwitch == true)
-            {
-                //Settings.Streamswitch == true ???
-            }
-        }
 
         private string _recBtnText;
         public string RecBtnText
@@ -91,6 +73,7 @@ namespace XFCognSpeechPrism.ViewModels
             : base(navigationService)
         {
             _dialogService = dialogService;
+            _navigationService = navigationService;
             SettingsPageCommand = new DelegateCommand(NavToSettings);
             RecordCommand = new DelegateCommand(TranscribeSent);
             Title = "Record Page";
@@ -115,14 +98,11 @@ namespace XFCognSpeechPrism.ViewModels
 
             micService = Xamarin.Forms.DependencyService.Resolve<IMicrophoneService>();
             firsttime = true;
-            _language = "de-DE";
+            _language = Settings.SpeechLanguage;
         }
 
         private async void TranscribeSent()
         {
-            //_dialogService.DisplayAlertAsync("Record", "(TODO)", "OK");
-            //await RecordAudio();
-
             bool isMicEnabled = await micService.GetPermissionAsync();
 
             // EARLY OUT: make sure mic is accessible
@@ -132,10 +112,21 @@ namespace XFCognSpeechPrism.ViewModels
                 return;
             }
 
+            // API key can be a shared, multi-resource key or an individual service key
+            // and can be found and regenerated in the Azure portal 
+            // Endpoint is based on your configured region, for example "WestEurope"
+            // SpeechConfig.FromSubscription(CognitiveServicesApiKey, CognitiveServicesRegion)
+            if (Settings.Akey == "YourApiStringHere" || Settings.Aregion == "YourRegionHere")
+            {
+                await _dialogService.DisplayAlertAsync("Missing API key", "Generate your key in the Azure portal!", "OK");
+                return;
+            }
+
             // initialize speech recognizer 
             if (recognizer == null)
             {
-                var config = SpeechConfig.FromSubscription(Constants.CognitiveServicesApiKey, Constants.CognitiveServicesRegion);
+ 
+                var config = SpeechConfig.FromSubscription(Settings.Akey, Settings.Aregion);
                 recognizer = new SpeechRecognizer(config, Language);  // 8 overloads!
 
                 recognizer.Recognized += (obj, args) =>
@@ -221,7 +212,8 @@ namespace XFCognSpeechPrism.ViewModels
 
         private void NavToSettings()
         {
-            _dialogService.DisplayAlertAsync("Settings", "Goto Settings (TODO)", "OK");
+            //_dialogService.DisplayAlertAsync("Settings", "Goto Settings (TODO)", "OK");
+            _navigationService.NavigateAsync("SettingsPage");
         }
 
 

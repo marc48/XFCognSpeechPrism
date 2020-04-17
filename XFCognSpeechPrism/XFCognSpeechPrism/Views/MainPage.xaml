@@ -16,10 +16,7 @@
     <StackLayout Padding="20">
       <StackLayout  Orientation="Vertical" VerticalOptions="StartAndExpand">
         <StackLayout Orientation="Horizontal">
-          <Switch VerticalOptions="Center" IsToggled="{Binding StreamSwitch}" Visual="Material"/>
-          <Label Text="Send audio data while recording"  VerticalOptions="Center" />
         </StackLayout>
-
         <Button Text="{Binding RecBtnText}" FontSize="24" HorizontalOptions="FillAndExpand"
                 Command="{Binding RecordCommand}" IsEnabled="{Binding ButtonEnabled}" 
                 BackgroundColor="{Binding BtnColor}"/>

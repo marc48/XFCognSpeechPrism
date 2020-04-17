@@ -5,10 +5,25 @@
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="XFCognSpeechPrism.Views.SettingsPage"
              Title="Settings" >
-
-  <StackLayout Padding="20">
-    <Label Text="Settings..." />
-  </StackLayout>
   
- 
+  <StackLayout Padding="20" Spacing="5">
+    <StackLayout Orientation="Horizontal" Padding="5,0,5,0">
+      <Label Text="Language" FontSize="Small" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+      <Entry HorizontalOptions="EndAndExpand" Text="{Binding InputLang}" FontSize="Small" />
+    </StackLayout>
+    <BoxView Color="Silver" HorizontalOptions="Fill" HeightRequest="1" />
+    <StackLayout Orientation="Horizontal" Padding="5,0,5,0">
+      <Label Text="Akey" FontSize="Small" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+      <Entry HorizontalOptions="EndAndExpand" Text="{Binding Akey}" FontSize="Small" MinimumWidthRequest="200"/>
+    </StackLayout>
+    <BoxView Color="Silver" HorizontalOptions="Fill" HeightRequest="1" />
+    <StackLayout Orientation="Horizontal" Padding="5,0,5,0">
+      <Label Text="Aregion" FontSize="Small" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+      <Entry HorizontalOptions="EndAndExpand" Text="{Binding Aregion}" FontSize="Small" 
+             MinimumHeightRequest="200"/>
+    </StackLayout>
+    <BoxView Color="Silver" HorizontalOptions="Fill" HeightRequest="1" />
+    <Button Text="Save Settings" Command="{Binding SaveSettingsCommand}" BackgroundColor="AliceBlue"
+            FontSize="Small" Visual="Material" />
+  </StackLayout>
 </ContentPage>
