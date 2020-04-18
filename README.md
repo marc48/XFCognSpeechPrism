@@ -11,5 +11,6 @@
  * Important! You must get an Azure suscription key for using the service (free for private users)! Insert subscription key and your region on the Settings Page.
  * Language tested: de-DE
  * For more options see plugin Xamarin.Cognitive.Speech by Nate Rickard ( https://www.nuget.org/packages/Xamarin.Cognitive.Speech/ )
+ * Comments and suggestions for improvement welcome!
 
  
