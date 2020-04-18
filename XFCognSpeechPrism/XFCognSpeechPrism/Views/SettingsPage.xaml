@@ -23,7 +23,7 @@
              MinimumHeightRequest="200"/>
     </StackLayout>
     <BoxView Color="Silver" HorizontalOptions="Fill" HeightRequest="1" />
-    <Button Text="Save Settings" Command="{Binding SaveSettingsCommand}" BackgroundColor="AliceBlue"
-            FontSize="Small" Visual="Material" />
+    <Button Text="Save Settings" Command="{Binding SaveSettingsCommand}" BackgroundColor="#0277bd"
+            FontSize="Small" TextColor="White" Visual="Material" />
   </StackLayout>
 </ContentPage>

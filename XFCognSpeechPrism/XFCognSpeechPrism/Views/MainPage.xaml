@@ -6,7 +6,6 @@
              Title="{Binding Title}">
   <ContentPage.ToolbarItems>
     <ToolbarItem Text="Settings"
-                 IconImageSource="example_icon.png"
                  Command="{Binding SettingsPageCommand}"
                  Order="Secondary"
                  Priority="0" />
@@ -24,12 +23,12 @@
         <Label Text="Output:" />
         <Label Text="{Binding ResultsText}" HorizontalOptions="CenterAndExpand" LineBreakMode="WordWrap" 
                MinimumHeightRequest="300" MinimumWidthRequest="500" BackgroundColor="LightGray"
-               FontSize="Micro" />
+               FontSize="Small" />
       </StackLayout>
       <ContentView IsVisible="{Binding SpinnerEnabled}" HorizontalOptions="Fill" VerticalOptions="Fill" 
                    BackgroundColor="#A6FFFFFF">
         <ActivityIndicator IsRunning="{Binding SpinnerEnabled}" WidthRequest="100" HeightRequest="100" 
-                           HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" />
+                           HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Color="LightGray" />
       </ContentView>
     </StackLayout>
   </ContentPage.Content>
