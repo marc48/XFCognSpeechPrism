@@ -4,14 +4,11 @@ using Prism.Navigation;
 using Prism.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using System.Diagnostics;
 using XFCognSpeechPrism.Helpers;
-using XFCognSpeechPrism.Models;
 using Microsoft.CognitiveServices.Speech;
 using XFCognSpeechPrism.Services;
 
@@ -20,54 +17,11 @@ namespace XFCognSpeechPrism.ViewModels
     public class MainPageViewModel : ViewModelBase
     {
         private IPageDialogService _dialogService;
+        private INavigationService _navigationService;
         private SpeechRecognizer recognizer = null;
         IMicrophoneService micService;
         private bool isTranscribing = false;
-
-        //AudioRecorderService recorder;
-        //SpeechApiClient speechClient;
-
-        //public Array SpeechRegions => Enum.GetValues(typeof(SpeechRegion));
-        //public SpeechRegion SpeechRegion { get; set; } = SpeechRegion.WestEurope;
-        //public Array AuthenticationModes => Enum.GetValues(typeof(AuthenticationMode));
-        //public AuthenticationMode AuthenticationMode { get; set; } = AuthenticationMode.SubscriptionKey;
-        //public Array RecognitionModes => Enum.GetValues(typeof(RecognitionMode));
-        //public RecognitionMode RecognitionMode { get; set; } = RecognitionMode.Interactive;
-        //public Array ProfanityModes => Enum.GetValues(typeof(ProfanityMode));
-        //public ProfanityMode ProfanityMode { get; set; } = ProfanityMode.Masked;
-        //public Array OutputModes => Enum.GetValues(typeof(OutputMode));
-        //public OutputMode OutputMode { get; set; } = OutputMode.Simple;
-
-        private ObservableCollection<Sentence> _sents;
-        public ObservableCollection<Sentence> Sents
-        {
-            get { return _sents; }
-            set { SetProperty(ref _sents, value); }
-        }
-        private Sentence _sentence;
-        public Sentence Sentence
-        {
-            get { return _sentence; }
-            set { SetProperty(ref _sentence, value); }
-        }
-
-        private bool _streamSwitch;
-        public bool StreamSwitch
-        {
-            get { return _streamSwitch; }
-            set
-            {
-                SetProperty(ref _streamSwitch, value);
-                SwitchStreamToggle();
-            }
-        }
-        private void SwitchStreamToggle()
-        {
-            if (_streamSwitch == true)
-            {
-                //Settings.Streamswitch == true ???
-            }
-        }
+        private bool firsttime;
 
         private string _recBtnText;
         public string RecBtnText
@@ -104,6 +58,13 @@ namespace XFCognSpeechPrism.ViewModels
             set { SetProperty(ref _resultsText, value); }
         }
 
+        private string _language;
+        public string Language
+        {
+            get { return _language; }
+            set { SetProperty(ref _language, value); }
+        }
+
         public DelegateCommand SettingsPageCommand { get; set; }
         public DelegateCommand RecordCommand { get; set; }
 
@@ -112,14 +73,14 @@ namespace XFCognSpeechPrism.ViewModels
             : base(navigationService)
         {
             _dialogService = dialogService;
-            //micService = 
+            _navigationService = navigationService;
             SettingsPageCommand = new DelegateCommand(NavToSettings);
             RecordCommand = new DelegateCommand(TranscribeSent);
             Title = "Record Page";
 
-            _recBtnText = "Record Sent";
+            _recBtnText = "Transcribe";
             _buttonEnabled = true;
-            _sents = new ObservableCollection<Sentence>();
+            _btnColor = Color.FromHex("#43a047");
 
             //recorder = new AudioRecorderService
             //{
@@ -135,18 +96,13 @@ namespace XFCognSpeechPrism.ViewModels
 
             //speechClient = new SpeechApiClient(Keys.Speech.SubscriptionKey, SpeechRegion);
 
-            // Liste belegen
-            _sents.Add(new Sentence() { Text = "Der erste Satz." });
-
             micService = Xamarin.Forms.DependencyService.Resolve<IMicrophoneService>();
-            
+            firsttime = true;
+            _language = Settings.SpeechLanguage;
         }
 
         private async void TranscribeSent()
         {
-            //_dialogService.DisplayAlertAsync("Record", "(TODO)", "OK");
-            //await RecordAudio();
-
             bool isMicEnabled = await micService.GetPermissionAsync();
 
             // EARLY OUT: make sure mic is accessible
@@ -156,11 +112,22 @@ namespace XFCognSpeechPrism.ViewModels
                 return;
             }
 
+            // API key can be a shared, multi-resource key or an individual service key
+            // and can be found and regenerated in the Azure portal 
+            // Endpoint is based on your configured region, for example "WestEurope"
+            // SpeechConfig.FromSubscription(CognitiveServicesApiKey, CognitiveServicesRegion)
+            if (Settings.Akey == "YourApiStringHere" || Settings.Aregion == "YourRegionHere")
+            {
+                await _dialogService.DisplayAlertAsync("Missing API key", "Generate your key in the Azure portal!", "OK");
+                return;
+            }
+
             // initialize speech recognizer 
             if (recognizer == null)
             {
-                var config = SpeechConfig.FromSubscription(Constants.CognitiveServicesApiKey, Constants.CognitiveServicesRegion);
-                recognizer = new SpeechRecognizer(config, "de-DE");  // 8 overloads!
+ 
+                var config = SpeechConfig.FromSubscription(Settings.Akey, Settings.Aregion);
+                recognizer = new SpeechRecognizer(config, Language);  // 8 overloads!
 
                 recognizer.Recognized += (obj, args) =>
                 {
@@ -187,7 +154,11 @@ namespace XFCognSpeechPrism.ViewModels
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    InsertDateTimeRecord();
+                    //if (firsttime == true)
+                    //{
+                        InsertDateTimeRecord();
+                    //    firsttime = false;
+                    //}
                 });
                 try
                 {
@@ -201,7 +172,6 @@ namespace XFCognSpeechPrism.ViewModels
             }
             
             UpdateDisplayState();
-            //UpdateTranscription("Bis hierher und nicht weiter...");
         }
 
         void UpdateTranscription(string newText)
@@ -210,8 +180,7 @@ namespace XFCognSpeechPrism.ViewModels
             {
                 if (!string.IsNullOrWhiteSpace(newText))
                 {
-                    //ResultsText += $"{newText}\n";
-                    _sents.Add(new Sentence() { Text = newText });
+                    ResultsText += $"{newText}\n";
                 }
             });
         }
@@ -229,13 +198,13 @@ namespace XFCognSpeechPrism.ViewModels
                 if (isTranscribing)
                 {
                     RecBtnText = "Stop";
-                    BtnColor = Color.Red;
+                    BtnColor = Color.FromHex("#e53935");
                     SpinnerEnabled = true;
                 }
                 else
                 {
                     RecBtnText = "Transcribe";
-                    BtnColor = Color.Green;
+                    BtnColor = Color.FromHex("#43a047");
                     SpinnerEnabled = false;
                 }
             });
@@ -243,7 +212,8 @@ namespace XFCognSpeechPrism.ViewModels
 
         private void NavToSettings()
         {
-            _dialogService.DisplayAlertAsync("Settings", "Goto Settings (TODO)", "OK");
+            //_dialogService.DisplayAlertAsync("Settings", "Goto Settings (TODO)", "OK");
+            _navigationService.NavigateAsync("SettingsPage");
         }
 
 

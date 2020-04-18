@@ -15,35 +15,20 @@
   <ContentPage.Content>
     <StackLayout Padding="20">
       <StackLayout  Orientation="Vertical" VerticalOptions="StartAndExpand">
-        <Label Text="TODO: Optionen zuoberst, dann Record-Button, dann Liste von gespr. Sätzen anzeigen..." 
-                 LineBreakMode="WordWrap" />
-
         <StackLayout Orientation="Horizontal">
-          <Switch VerticalOptions="Center" IsToggled="{Binding StreamSwitch}" Visual="Material"/>
-          <Label Text="Send audio data while recording"  VerticalOptions="Center" />
         </StackLayout>
-
         <Button Text="{Binding RecBtnText}" FontSize="24" HorizontalOptions="FillAndExpand"
                 Command="{Binding RecordCommand}" IsEnabled="{Binding ButtonEnabled}" 
                 BackgroundColor="{Binding BtnColor}"/>
-        <Label Text="(15 sec max currently)" FontSize="14" HorizontalOptions="Center" />
+        <Label Text="{Binding Language}" FontSize="14" HorizontalOptions="Center" />
         <Label Text="Output:" />
         <Label Text="{Binding ResultsText}" HorizontalOptions="CenterAndExpand" LineBreakMode="WordWrap" 
-               MinimumHeightRequest="300" MinimumWidthRequest="400" BackgroundColor="LightGray"
+               MinimumHeightRequest="300" MinimumWidthRequest="500" BackgroundColor="LightGray"
                FontSize="Micro" />
-
-        <ListView ItemsSource="{Binding Sents}" SeparatorVisibility="Default"  HasUnevenRows="True" >
-          <ListView.ItemTemplate>
-            <DataTemplate>
-              <TextCell Text="{Binding Text}" />
-            </DataTemplate>
-          </ListView.ItemTemplate>
-        </ListView>
       </StackLayout>
-
       <ContentView IsVisible="{Binding SpinnerEnabled}" HorizontalOptions="Fill" VerticalOptions="Fill" 
                    BackgroundColor="#A6FFFFFF">
-        <ActivityIndicator x:Name="spinner" WidthRequest="100" HeightRequest="100" 
+        <ActivityIndicator IsRunning="{Binding SpinnerEnabled}" WidthRequest="100" HeightRequest="100" 
                            HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" />
       </ContentView>
     </StackLayout>
